@@ -6,78 +6,72 @@ function computerPlay() {
     let number = randomIntFromInterval(1, 3);
     switch (number) {
         case 1:
-            return 'Rock'
+            toggleAi('✊');
+            return '✊'
         case 2:
-            return 'Paper'
+            toggleAi('✋');
+            return '✋'
         case 3:
-            return 'Scissors'
+            toggleAi('✌️');
+            return '✌️'
         default:
             break;
     }
 }
 
-function capitaliseFirstLetter(str) {
-    return str[0].toUpperCase() + str.slice(1).toLowerCase();
+function toggleAi(pick) {
+    const aiButtons = document.querySelectorAll('.ai');
+    const aiOnButtons = document.querySelectorAll('.ai-on');
+    aiButtons.forEach(button => {
+        if (button.innerText == pick) {
+            button.classList.add('ai-on');
+            button.classList.remove('ai');
+        }
+    });
+
+    aiOnButtons.forEach(button => {
+        if (button.innerText != pick) {
+            button.classList.remove('ai-on');
+            button.classList.add('ai');
+        }
+    });
 }
+
 
 function playRound(playerSelection, computerSelection) {
-    playerSelection = playerSelection.toLowerCase();
-    let uiPlayerSelection = capitaliseFirstLetter(playerSelection);
-    if (playerSelection === 'rock' && computerSelection === 'Scissors'
-        || playerSelection === 'paper' && computerSelection === 'Rock'
-        || playerSelection === 'scissors' && computerSelection === 'Paper') {
+    const results = document.querySelector('.result');
+    const descs = document.querySelector('.desc');
+    const userScore = document.querySelector('.user.score');
+    const aiScore = document.querySelector('.npc.score');
+    const userPick = document.querySelector('.user.pick');
+    const npcPick = document.querySelector('.npc.pick');
+
+    userPick.textContent = playerSelection;
+    npcPick.textContent = computerSelection;
+
+    if (playerSelection === '✊' && computerSelection === '✌️'
+        || playerSelection === '✋' && computerSelection === '✊'
+        || playerSelection === '✌️' && computerSelection === '✋') {
         // What if the player wins?
-        return `You Win! ${uiPlayerSelection} beats ${computerSelection}`;
-    } else if (playerSelection === 'rock' && computerSelection === 'Paper'
-        || playerSelection === 'paper' && computerSelection === 'Scissors'
-        || playerSelection === 'scissors' && computerSelection === 'Rock') {
+        userScore.textContent = "Player: " + (parseInt(userScore.innerText.slice(-1)) + 1);
+        results.textContent = "You Win!";
+        descs.textContent = `${playerSelection} beats ${computerSelection}`;
+    } else if (playerSelection === '✊' && computerSelection === '✋'
+        || playerSelection === '✋' && computerSelection === '✌️'
+        || playerSelection === '✌️' && computerSelection === '✊') {
         // What if the computer wins?
-        return `You Lose! ${computerSelection} beats ${uiPlayerSelection}`;
+        results.textContent = "You Lose!";
+        aiScore.textContent = "NPC: " + (parseInt(aiScore.innerText.slice(-1)) + 1);
+        descs.textContent = `${computerSelection} beats ${playerSelection}`;
     } else {
-        return `Draw! ${uiPlayerSelection} and ${computerSelection}`
+        results.textContent = "Draw";
+        descs.textContent = `${playerSelection} and ${computerSelection}`;
     }
 
 }
 
-function userInput() {
-    let userChoice = ' ';
-    while (
-        userChoice.toLowerCase() != 'rock' &&
-        userChoice.toLowerCase() != 'paper' &&
-        userChoice.toLowerCase() != 'scissors') {
-        userChoice = prompt("Enter Rock, Paper, Scissors!")
-    }
 
-    return userChoice;
-}
-
-function game() {
-    let pointsPC = 0;
-    let pointsPlayer = 0;
-
-    for (let i = 1; i <= 5; i++) {
-        console.log("Round " + i);
-        let currentRound = playRound(userInput(), computerPlay());
-        if (currentRound.toLowerCase().includes('draw')) {
-            console.log(currentRound);
-        } else if (currentRound.toLowerCase().includes('lose')) {
-            console.log(currentRound);
-            pointsPC++;
-        } else if (currentRound.toLowerCase().includes('win')) {
-            console.log(currentRound);
-            pointsPlayer++;
-        }
-
-        console.log(`You now have ${pointsPlayer} points!\nThe NPC has ${pointsPC} points`);
-    }
-
-    if (pointsPC > pointsPlayer) {
-        console.log("You lost!");
-    } else if (pointsPlayer > pointsPC) {
-        console.log("You won!");
-    } else {
-        console.log("Draw!");
-    }
-}
-
-game()
+const playButtons = document.querySelectorAll('.pickable');
+playButtons.forEach(button => {
+    button.addEventListener('click', () => playRound(button.innerText, computerPlay()));
+});
